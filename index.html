@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Heart VR/AR View</title>
-    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-    <!-- Add DeviceOrientationControls -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>Anatomical Heart VR/AR View</title>
     <style>
         * {
             margin: 0;
@@ -18,13 +15,19 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            background-color: #f0f0f0;
         }
 
-        model-viewer {
+        .model-container {
             width: 100%;
             height: 100%;
-            background-color: #f0f0f0;
-            --poster-color: #ffffff00;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         .controls {
@@ -40,7 +43,7 @@
 
         .control-button {
             padding: 15px 30px;
-            background: #4285f4;
+            background: #1CAAD9;
             color: white;
             font-weight: bold;
             border-radius: 30px;
@@ -61,6 +64,26 @@
             z-index: 100;
         }
 
+        #credits {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            text-align: center;
+            z-index: 99;
+        }
+
+        #credits a {
+            color: #1CAAD9;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
         #error-message {
             position: fixed;
             top: 50%;
@@ -74,153 +97,50 @@
             text-align: center;
             max-width: 80%;
         }
+
+        .ar-button {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: #1CAAD9;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
-    <div id="mode-indicator">Standard View</div>
+    <div id="mode-indicator">Sketchfab Viewer</div>
     <div id="error-message"></div>
     
-    <model-viewer
-        id="heart-model"
-        src="normal_teenage_heart.glb"
-        alt="3D Heart Model"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        ar-scale="auto"
-        camera-controls
-        ar-placement="floor"
-        quick-look-browsers="safari chrome"
-        xr-environment
-        environment-image="neutral"
-        shadow-intensity="1"
-        camera-orbit="0deg 75deg 2m"
-        min-field-of-view="10deg"
-        max-field-of-view="90deg"
-        interaction-prompt="none">
-    </model-viewer>
-
-    <div class="controls">
-        <button class="control-button" id="vrMode">Enable VR Mode</button>
-        <button class="control-button" id="arButton">View in AR</button>
-        <button class="control-button" id="resetView">Reset View</button>
+    <div class="model-container">
+        <iframe
+            title="Anatomical Human Heart"
+            frameborder="0"
+            allowfullscreen
+            mozallowfullscreen="true"
+            webkitallowfullscreen="true"
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            xr-spatial-tracking
+            execution-while-out-of-viewport
+            execution-while-not-rendered
+            web-share
+            src="https://sketchfab.com/models/e48637d3399a4e5184bdf169929dc36e/embed?autostart=1&ui_controls=1&ui_infos=1&ui_inspector=1&ui_stop=1&ui_watermark=1&ui_watermark_link=1">
+        </iframe>
     </div>
 
-    <script>
-        const modelViewer = document.querySelector('#heart-model');
-        const errorMessage = document.getElementById('error-message');
-        const modeIndicator = document.getElementById('mode-indicator');
-        const vrModeButton = document.getElementById('vrMode');
-        const resetViewButton = document.getElementById('resetView');
-        
-        let isVRMode = false;
-        let deviceOrientationPermission = false;
+    <div id="credits">
+        Model: <a href="https://sketchfab.com/3d-models/anatomical-human-heart-e48637d3399a4e5184bdf169929dc36e" target="_blank">Anatomical Human Heart</a> by 
+        <a href="https://sketchfab.com/joshuawhittaker" target="_blank">Joshua Whittaker</a>
+    </div>
 
-        // Initial camera position
-        const defaultOrbit = '0deg 75deg 2m';
-        const defaultFieldOfView = '45deg';
-
-        // Handle VR Mode
-        vrModeButton.addEventListener('click', async () => {
-            if (!isVRMode) {
-                try {
-                    // Request device orientation permission on iOS
-                    if (typeof DeviceOrientationEvent !== 'undefined' && 
-                        typeof DeviceOrientationEvent.requestPermission === 'function') {
-                        const permission = await DeviceOrientationEvent.requestPermission();
-                        deviceOrientationPermission = permission === 'granted';
-                    } else {
-                        deviceOrientationPermission = true;
-                    }
-
-                    if (deviceOrientationPermission) {
-                        enableVRMode();
-                    } else {
-                        throw new Error('Permission to access device orientation was denied');
-                    }
-                } catch (error) {
-                    console.error('Error enabling VR mode:', error);
-                    errorMessage.textContent = 'VR mode is not supported on this device or permission was denied';
-                    errorMessage.style.display = 'block';
-                    setTimeout(() => {
-                        errorMessage.style.display = 'none';
-                    }, 3000);
-                }
-            } else {
-                disableVRMode();
-            }
-        });
-
-        function enableVRMode() {
-            isVRMode = true;
-            vrModeButton.textContent = 'Disable VR Mode';
-            modeIndicator.textContent = 'VR Mode Active';
-            
-            // Enable device orientation controls
-            window.addEventListener('deviceorientation', handleDeviceOrientation);
-            
-            // Disable model-viewer's built-in camera controls
-            modelViewer.cameraControls = false;
-        }
-
-        function disableVRMode() {
-            isVRMode = false;
-            vrModeButton.textContent = 'Enable VR Mode';
-            modeIndicator.textContent = 'Standard View';
-            
-            // Disable device orientation controls
-            window.removeEventListener('deviceorientation', handleDeviceOrientation);
-            
-            // Re-enable model-viewer's camera controls
-            modelViewer.cameraControls = true;
-            
-            // Reset to default view
-            resetView();
-        }
-
-        function handleDeviceOrientation(event) {
-            if (!isVRMode) return;
-
-            // Convert device orientation to camera orbit
-            // Beta: x-axis (-180 to 180) - tilt front/back
-            // Gamma: y-axis (-90 to 90) - tilt left/right
-            // Alpha: z-axis (0 to 360) - device compass direction
-            
-            const beta = event.beta || 0;  // Front/Back tilt
-            const gamma = event.gamma || 0; // Left/Right tilt
-            const alpha = event.alpha || 0; // Compass direction
-
-            // Normalize values for model-viewer camera orbit
-            const yOrbit = (alpha + 180) % 360; // Horizontal rotation
-            const xOrbit = Math.max(-45, Math.min(45, gamma)); // Vertical rotation
-            const distance = `${2 - Math.abs(beta) / 90}m`; // Zoom based on tilt
-
-            // Update camera position
-            modelViewer.cameraOrbit = `${yOrbit}deg ${xOrbit}deg ${distance}`;
-        }
-
-        // Reset view button
-        resetViewButton.addEventListener('click', resetView);
-
-        function resetView() {
-            modelViewer.cameraOrbit = defaultOrbit;
-            modelViewer.fieldOfView = defaultFieldOfView;
-        }
-
-        // Error handling
-        modelViewer.addEventListener('error', (error) => {
-            console.error('Error loading model:', error);
-            errorMessage.textContent = 'Error loading the 3D model. Please check your connection and try again.';
-            errorMessage.style.display = 'block';
-        });
-
-        // Check device compatibility
-        if (window.DeviceOrientationEvent) {
-            console.log('Device orientation is supported');
-        } else {
-            console.log('Device orientation is not supported');
-            vrModeButton.disabled = true;
-            vrModeButton.textContent = 'VR Not Supported';
-        }
-    </script>
+    <a href="https://sketchfab.com/models/e48637d3399a4e5184bdf169929dc36e/ar" target="_blank" class="ar-button">
+        View in AR
+    </a>
 </body>
 </html>
