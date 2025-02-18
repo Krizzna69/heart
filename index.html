@@ -348,17 +348,13 @@
       };
 
       let currentSpeech = null;
-      const infoPanel = document.getElementById("infoPanel");
-      const infoPanelTitle = document.getElementById("infoPanelTitle");
-      const infoPanelText = document.getElementById("infoPanelText");
+     
 
       function speak(section) {
         stopSpeaking();
 
         const data = heartData[section];
-        infoPanelTitle.textContent = data.title;
-        infoPanelText.textContent = data.text;
-        infoPanel.style.display = "block";
+        
 
         currentSpeech = new SpeechSynthesisUtterance(data.text);
         currentSpeech.rate = 0.9;
