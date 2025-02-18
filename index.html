@@ -26,6 +26,7 @@
         height: 100vh;
         overflow: hidden;
         background: linear-gradient(135deg, #1a1a1a 0%, #363636 100%);
+        position: relative;
       }
 
       .model-container {
@@ -89,15 +90,15 @@
 
       .narration-controls {
         position: fixed;
-        left: 20px;
-        top: 50%;
-        transform: translateY(-50%);
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
         background: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border-radius: 15px;
+        padding: 15px 25px;
+        border-radius: 30px;
         z-index: 100;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 10px;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -115,6 +116,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex: 1;
       }
 
       .narration-button:hover {
@@ -226,46 +228,53 @@
         transform: translateX(-50%) translateY(-2px);
         box-shadow: 0 6px 20px rgba(28, 170, 217, 0.4);
       }
+
+      /* Mobile View */
+      @media (max-width: 768px) {
+        .narration-controls {
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          flex-direction: row;
+          gap: 10px;
+        }
+
+        .narration-button {
+          padding: 10px 15px;
+          font-size: 14px;
+        }
+
+        .ar-button {
+          bottom: 100px;
+          padding: 10px 20px;
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .narration-controls {
+          bottom: 15px;
+          padding: 10px 15px;
+        }
+
+        .narration-button {
+          padding: 8px 12px;
+          font-size: 12px;
+        }
+
+        .ar-button {
+          bottom: 80px;
+          padding: 8px 15px;
+          font-size: 12px;
+        }
+      }
     </style>
   </head>
   <body>
-    
-
     <div class="narration-controls">
       <button class="narration-button" onclick="speakOverview()">
         <div class="speaking-indicator" data-section="overview"></div>
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"
-          />
-        </svg>
         Overview
-      </button>
-      <button class="narration-button" onclick="speakChambers()">
-        <div class="speaking-indicator" data-section="chambers"></div>
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-          />
-        </svg>
-        Chambers
-      </button>
-      <button class="narration-button" onclick="speakVessels()">
-        <div class="speaking-indicator" data-section="vessels"></div>
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
-          />
-        </svg>
-        Vessels
-      </button>
-      <button class="narration-button" onclick="stopSpeaking()">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"
-          />
-        </svg>
-        Stop
       </button>
     </div>
 
@@ -302,7 +311,6 @@
       <a href="https://sketchfab.com/joshuawhittaker" target="_blank"
         >Joshua Whittaker</a
       ><br />
-    
     </div>
 
     <a
@@ -318,7 +326,7 @@
       const heartData = {
         overview: {
           title: "Heart Overview",
-          text: "The heart is a muscular organ about the size of a fist, located just behind and slightly left of the breastbone. The heart pumps blood through the network of arteries and veins called the cardiovascular system.",
+          text: "The heart is a muscular organ about the size of a fist, located just behind and slightly left of the breastbone. The heart pumps blood through the network of arteries and veins called the cardiovascular system.The heart has four main chambers:The Right Atrium receives deoxygenated blood from the body through the vena cava.The Right Ventricle pumps deoxygenated blood to the lungs.The Left Atrium receives oxygenated blood from the lungs.The Left Ventricle pumps oxygenated blood to the body through the aorta.The Superior Vena Cava brings blood from the upper body to the right atrium.The Inferior Vena Cava brings blood from the lower body to the right atrium.The Pulmonary Arteries carry deoxygenated blood to the lungs.The Pulmonary Veins return oxygenated blood from the lungs.The Aorta distributes oxygenated blood throughout the body.",
         },
         chambers: {
           title: "Heart Chambers",
@@ -344,9 +352,6 @@
       const infoPanelTitle = document.getElementById("infoPanelTitle");
       const infoPanelText = document.getElementById("infoPanelText");
 
-      // Update session time
-      
-
       function speak(section) {
         stopSpeaking();
 
@@ -355,16 +360,11 @@
         infoPanelText.textContent = data.text;
         infoPanel.style.display = "block";
 
-        document.querySelector(`[data-section="${section}"]`).style.display =
-          "inline-block";
-
         currentSpeech = new SpeechSynthesisUtterance(data.text);
         currentSpeech.rate = 0.9;
         currentSpeech.pitch = 1;
 
         currentSpeech.onend = () => {
-          document.querySelector(`[data-section="${section}"]`).style.display =
-            "none";
           setTimeout(() => {
             if (!currentSpeech) {
               infoPanel.style.display = "none";
@@ -378,42 +378,29 @@
         if (currentSpeech) {
           window.speechSynthesis.cancel();
           currentSpeech = null;
-          document
-            .querySelectorAll(".speaking-indicator")
-            .forEach((indicator) => {
-              indicator.style.display = "none";
-            });
           infoPanel.style.display = "none";
         }
       }
 
       function speakOverview() {
         speak("overview");
-      }
-      function speakChambers() {
-        speak("chambers");
-      }
-      function speakVessels() {
-        speak("vessels");
+
       }
 
       // Initialize session
       document.addEventListener("DOMContentLoaded", () => {
         // Set initial values
-        document.getElementById("userName").textContent = sessionConfig.user;
-        document.getElementById(
-          "currentTime"
-        ).textContent = `${sessionConfig.startTime} ${sessionConfig.timezone}`;
+        // You can set sessionConfig as needed
+        // For example:
+        // document.getElementById("userName").textContent = sessionConfig.user;
+        // document.getElementById("currentTime").textContent = `${sessionConfig.startTime} ${sessionConfig.timezone}`;
 
         // Start session timer
-        updateSessionTime();
-        setInterval(updateSessionTime, 1000);
+        // updateSessionTime();
+        // setInterval(updateSessionTime, 1000);
 
         // Log session start
-        console.log(`Session started - User: ${sessionConfig.user}`);
-        console.log(
-          `Start Time: ${sessionConfig.startTime} ${sessionConfig.timezone}`
-        );
+        console.log("Session started");
       });
 
       // Handle visibility change
@@ -423,7 +410,7 @@
           stopSpeaking();
         } else {
           console.log(`Session resumed - ${new Date().toISOString()}`);
-          updateSessionTime();
+          // updateSessionTime();
         }
       });
 
@@ -434,10 +421,6 @@
         console.log(`Session ended - ${endTime}`);
       });
 
-      // Update session info with current data
-      
-
-      
       // Initialize voice selection
       window.speechSynthesis.onvoiceschanged = () => {
         const voices = window.speechSynthesis.getVoices();
@@ -450,7 +433,7 @@
           currentSpeech = new SpeechSynthesisUtterance();
           currentSpeech.voice = preferredVoice;
           currentSpeech.rate = 0.9;
-          currentSpeech.pitch = 1;
+          currentVoice.pitch = 1;
         }
       };
 
@@ -462,7 +445,7 @@
           line: lineNo,
           column: columnNo,
           error: error,
-          user: currentSession.user,
+          user: "currentSession.user",
           time: new Date().toISOString(),
         });
         return false;
